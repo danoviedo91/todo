@@ -48,12 +48,20 @@
         <tbody>
           <tr>
             <td class="wwc-task-name">
-              <i class="far fa-check-circle"></i>
+              {{if .Completed}}
+              <a href="/completed{{.EncodeQueryURL}}&completed=false" class="wwc-completed-check"><i class="far fa-check-circle wwc-txt-green"></i></a>
+              {{else}}
+              <a href="/completed{{.EncodeQueryURL}}&completed=true" class="wwc-completed-check"><i class="far fa-check-circle"></i></a>
+              {{end}}              
               <span>{{.Title}}</span>
             </td>
             <td class="wwc-task-date-and-actions">{{.Deadline.UTC.Day}} {{.Deadline.UTC.Month}} {{.Deadline.UTC.Year}}</td>
             <td class="wwc-task-date-and-actions">
-              <a href="/edit{{.EncodeQueryURL}}" class="wwc-edit-item"><i class="fas fa-pencil-alt"></i></a>
+              {{if .Completed}}
+              <a href="/edit{{.EncodeQueryURL}}&completed=true" class="wwc-edit-item"><i class="fas fa-pencil-alt"></i></a>
+              {{else}}
+              <a href="/edit{{.EncodeQueryURL}}&completed=false" class="wwc-edit-item"><i class="fas fa-pencil-alt"></i></a>
+              {{end}}
               <a href="/delete"><i class="far fa-trash-alt"></i></a>
             </td>
           </tr>

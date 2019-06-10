@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"strconv"
 	"time"
 
 	"github.com/danoviedo91/todo/models"
@@ -47,9 +48,14 @@ func New(w http.ResponseWriter, r *http.Request) {
 
 // Create fills the struct with info and returns it to index.html
 func Create(w http.ResponseWriter, r *http.Request) {
+
+	// Assign to r the POST information sent with the form
 	r.ParseForm()
+
+	// Declare empty todo struct
 	todo := models.Todo{}
 
+	// Get Time.time correct format for todo.Deadline
 	layout := "2006-01-02"
 	duedate, err := time.Parse(layout, r.FormValue("todo-date"))
 
@@ -57,10 +63,15 @@ func Create(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 	}
 
+	// Assign values to todo struct
 	todo.Deadline = duedate
 	todo.Description = r.FormValue("todo-description")
 	todo.Title = r.FormValue("todo-title")
-	todo.Completed = false
+	todo.Completed, err = strconv.ParseBool(r.FormValue("todo-completed"))
+
+	if err != nil {
+		fmt.Println(err)
+	}
 
 	//Establish database connection
 
@@ -86,21 +97,32 @@ func Create(w http.ResponseWriter, r *http.Request) {
 // Edit allows changing the task information
 func Edit(w http.ResponseWriter, r *http.Request) {
 
-	todo := models.Todo{}
+	// queryValues gets all GET parameters sent with the URL
+	queryValues := r.URL.Query()
 
+	// Assign true or false to todo.Completed
+	completed, _ := strconv.ParseBool(queryValues.Get("completed"))
+
+	todo := models.Todo{
+		Completed: completed,
+	}
+
+	// Get Time.time correct format for todo.Deadline
 	layout := "01/02/2006"
-	duedateDecoded, _ := url.QueryUnescape(r.URL.Query()["limitdate"][0])
+	duedateDecoded, _ := url.QueryUnescape(queryValues.Get("limitdate"))
 	duedate, err := time.Parse(layout, duedateDecoded)
 
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	todo.Title, _ = url.QueryUnescape(r.URL.Query()["title"][0])
-	todo.Description, _ = url.QueryUnescape(r.URL.Query()["description"][0])
+	// Assign values to todo struct
+
+	todo.Title, _ = url.QueryUnescape(queryValues.Get("title"))
+	todo.Description, _ = url.QueryUnescape(queryValues.Get("description"))
 	todo.Deadline = duedate
 
-	//Parse HTML template
+	// Parse HTML template
 	html, err := template.ParseFiles("templates/todos/edit.html")
 	if err != nil {
 		log.Fatal(err)
@@ -116,9 +138,50 @@ func Edit(w http.ResponseWriter, r *http.Request) {
 // Delete removes the record
 func Delete(w http.ResponseWriter, r *http.Request) {
 
+	// todo gets cleared out
 	todo := models.Todo{}
 
-	//Parse HTML template
+	// Parse HTML template
+	html, err := template.ParseFiles("templates/todos/index.html")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = html.Execute(w, todo)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+// Completed marks item as completed or incomplete
+func Completed(w http.ResponseWriter, r *http.Request) {
+
+	// queryValues gets all GET parameters sent with the URL
+	queryValues := r.URL.Query()
+
+	// Assign true or false to todo.Completed
+	completed, _ := strconv.ParseBool(queryValues.Get("completed"))
+
+	todo := models.Todo{
+		Completed: completed,
+	}
+
+	// Get Time.time correct format for todo.Deadline
+
+	layout := "01/02/2006"
+	duedateDecoded, _ := url.QueryUnescape(queryValues.Get("limitdate"))
+	duedate, err := time.Parse(layout, duedateDecoded)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	// Assign values to todo struct
+	todo.Title, _ = url.QueryUnescape(queryValues.Get("title"))
+	todo.Description, _ = url.QueryUnescape(queryValues.Get("description"))
+	todo.Deadline = duedate
+
+	// Parse HTML template
 	html, err := template.ParseFiles("templates/todos/index.html")
 	if err != nil {
 		log.Fatal(err)

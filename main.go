@@ -18,6 +18,7 @@ func main() {
 	http.HandleFunc("/create", actions.Create)
 	http.HandleFunc("/edit", actions.Edit)
 	http.HandleFunc("/delete", actions.Delete)
+	http.HandleFunc("/completed", actions.Completed)
 
 	http.ListenAndServe(":3000", nil)
 }

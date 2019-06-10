@@ -1,6 +1,26 @@
+/* 
+    0.  GENERAL RULES
+*/
+
 body {
     background-color: #f7f7f6
 }
+
+/* 
+    1.  HELPER CLASSES
+*/
+
+.wwc-txt-green {
+    color: green !important;
+}
+
+.wwc-hidden {
+    display: none !important;
+}
+
+/* 
+    2.  STYLING CLASSES
+*/
 
 .wwc-navbar {
     background-color: #72c0db !important;
@@ -102,8 +122,8 @@ body {
     padding-left: 70px !important;
 }
 
-#wwc-task-table .fa-check-circle {
-    padding: 0 18px;
+.wwc-completed-check {
+    margin: 0 18px;
 }
 
 .wwc-edit-item {
@@ -160,5 +180,14 @@ body {
 }
 
 .wwc-task-date-and-actions .fa-trash-alt:hover {
+    opacity: 1;
+}
+
+.wwc-task-name .fa-check-circle {
+    color: #343a40;
+    opacity: 0.40;
+}
+
+.wwc-task-name .fa-check-circle:hover {
     opacity: 1;
 }

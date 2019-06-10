@@ -45,8 +45,12 @@
 			</div>
 			<div class="form-group">
 				<label for="todo-description">Description</label>
-				<textarea name="todo-description" class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
-			</div>
+				<textarea name="todo-description" class="form-control" id="todo-description" rows="3"></textarea>
+      </div>
+      <div class="form-group wwc-hidden">
+          <label for="todo-completed">Description</label>
+          <input name="todo-completed" type="text" class="form-control" id="todo-completed" aria-describedby="emailHelp" value=false>
+        </div>
 			<div class="d-flex justify-content-end">
 				<a class="btn wwc-cancel-btn" href="/">Cancel</a>
 				<button type="submit" class="btn text-white wwc-create-task-btn">Create Task</button>
