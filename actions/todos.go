@@ -7,7 +7,10 @@ import (
 	"net/http"
 	"net/url"
 	"time"
-	"todo/models"
+
+	"github.com/danoviedo91/todo/models"
+	//"github.com/jinzhu/gorm"
+	//_ "github.com/jinzhu/gorm/dialects/postgres" //postgres database driver
 )
 
 // Index is used to parse index.html the first time user enters the website
@@ -58,6 +61,15 @@ func Create(w http.ResponseWriter, r *http.Request) {
 	todo.Description = r.FormValue("todo-description")
 	todo.Title = r.FormValue("todo-title")
 	todo.Completed = false
+
+	//Establish database connection
+
+	// db, err := gorm.Open("postgres", "host=localhost port=5432 user=postgres dbname=todo password=root")
+	// defer db.Close()
+
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
 	//Parse HTML template
 	html, err := template.ParseFiles("templates/todos/index.html")

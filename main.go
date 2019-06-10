@@ -2,7 +2,8 @@ package main
 
 import (
 	"net/http"
-	"todo/actions"
+
+	"github.com/danoviedo91/todo/actions"
 )
 
 func main() {
