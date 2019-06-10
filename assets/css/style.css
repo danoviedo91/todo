@@ -1,0 +1,164 @@
+body {
+    background-color: #f7f7f6
+}
+
+.wwc-navbar {
+    background-color: #72c0db !important;
+    padding: 25px 32px;
+}
+
+.wwc-navbar-brand {
+    margin-right: 58px;
+}
+
+.font-size-navbar {
+    font-size: 28px;
+}
+
+.wwc-uncompleted-and-date {
+    border-left: 2px solid white;
+    padding-left: 29px;
+}
+
+.wwc-number-of-incompleted-tasks {
+    font-weight: 500;
+    font-size: 17px;
+}
+
+.wwc-today-date {
+    font-size: 14px;
+    font-weight: 100;
+}
+
+.wwc-nav-link {
+    font-weight: 300;
+}
+
+.wwc-active-link {
+    font-weight: 500;
+}
+
+.wwc-nav-first-link {
+    margin-right: 46px;
+}
+
+.wwc-add-task-btn {
+    display: inline-block;
+    margin: 16px 32px 16px auto;
+    padding: 10px 40px;
+    background-color: #72c0db !important;
+}
+.active {
+    background-color: #194767!important;
+    border: 1px solid rgba(0,0,0,.125) !important;
+}
+
+.list-group-item {
+    padding: 1.15rem 1.25rem;
+}
+
+.wwc-tasks-container {
+    margin-right: 32px;
+    margin-left: 32px;
+}
+
+.wwc-tasks-container {
+    border-radius: 30px;
+}
+
+.table {
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.table-bordered {
+    border-radius: 30px;
+}
+
+.wwc-task-name {
+    width: 60%;
+}
+
+.wwc-task-date-and-actions {
+    width: 20%;
+}
+
+.table .thead-dark th {
+    background-color: #194767 !important;
+    padding: 1.15rem .75rem;
+    font-weight: normal;
+}
+
+.table td {
+    padding: 1.15rem .75rem;
+    border-top: 1px solid #dee2e6;
+    background-color: white;
+}
+
+.wwc-thead-first-element {
+    padding-left: 70px !important;
+}
+
+#wwc-task-table .fa-check-circle {
+    padding: 0 18px;
+}
+
+.wwc-edit-item {
+    margin-right: 30px;
+}
+
+.wwc-task-name span {
+    color: #72c0db
+}
+
+.wwc-home-link:hover {
+    text-decoration: none;
+}
+
+.wwc-form-wrapper {
+    width: 60%;
+    margin: 0 auto;
+    background: white;
+    margin-top: 50px;
+    padding: 30px 35px;
+}
+
+.wwc-fields-wrapper > div {
+    width: 48%;
+}
+
+.wwc-form-title {
+    font-size: 23px;
+    font-weight: 600;
+    margin-bottom: 24px;
+}
+
+.wwc-cancel-btn {
+    background: #f7f7f6;
+    margin-right: 20px;
+}
+
+.wwc-create-task-btn {
+    background-color: #72c0db;
+}
+
+.wwc-task-date-and-actions .fa-pencil-alt {
+    opacity: 0.4;
+    color: #343a40;
+}
+
+.wwc-task-date-and-actions .fa-pencil-alt:hover {
+    opacity: 1;
+}
+
+.wwc-task-date-and-actions .fa-trash-alt {
+    opacity: 0.4;
+    color: red;
+}
+
+.wwc-task-date-and-actions .fa-trash-alt:hover {
+    opacity: 1;
+}
