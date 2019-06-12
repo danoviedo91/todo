@@ -2,34 +2,104 @@ package models
 
 import (
 	"fmt"
-	"net/url"
-	"strings"
 	"time"
+
+	"github.com/gofrs/uuid"
+	"github.com/jinzhu/gorm"
 )
+
+//---- TODO MODEL ----//
 
 // Todo --> struct that contains todo's fields
 type Todo struct {
-	Title       string
-	Description string
-	Deadline    time.Time
+	ID          uuid.UUID `gorm:"type:uuid;primary_key;"`
+	Title       string    `gorm:"type:varchar(100)"`
+	Description string    `gorm:"type:varchar(255)"`
+	Deadline    time.Time `gorm:"type:DATE"`
+	Completed   bool      `gorm:"type:bool"`
+}
+
+//---- TemplateData MODEL ----//
+
+// TemplateData is used to send data to the HTML template
+type TemplateData struct {
+	PendingTasksNumber int
+	CurrentDateTime    time.Time
+	TasksArray         []Todo
+	TaskStruct         Todo
+	FilterStatus
+}
+
+// FilterStatus gets true or false depending on query string from /?completed=
+type FilterStatus struct {
+	Incompleted bool
 	Completed   bool
 }
 
-// EncodeQueryURL encodes the strings from Todo struct making it URL friendly
-func (t Todo) EncodeQueryURL() string {
+//---- DATABASE CRUD OPERATIONS (METHODS) ----//
 
-	duedate := t.Deadline.Format("01/02/2006")
-
-	var sb strings.Builder
-	sb.WriteString("?title=")
-	sb.WriteString(url.QueryEscape(t.Title))
-	sb.WriteString("&description=")
-	sb.WriteString(url.QueryEscape(t.Description))
-	sb.WriteString("&limitdate=")
-	sb.WriteString(url.QueryEscape(duedate))
-	return sb.String()
-
+// Create inserts a row in the database
+func (t Todo) Create(db *gorm.DB) {
+	db.Create(&t)
 }
+
+// ReadAll returns all the tasks
+func (t Todo) ReadAll(db *gorm.DB) []Todo {
+	allUncompletedRecords := []Todo{}
+	db.Find(&allUncompletedRecords)
+	return allUncompletedRecords
+}
+
+// ReadAllUncomplete returns all the tasks which are NOT complete
+// func (t Todo) ReadAllUncomplete(db *gorm.DB) []Todo {
+// 	allUncompletedRecords := []Todo{}
+// 	db.Where("completed = ?", false).Find(&allUncompletedRecords)
+// 	return allUncompletedRecords
+// }
+
+// ReadAllComplete returns all the tasks which ARE complete
+// func (t Todo) ReadAllComplete(db *gorm.DB) []Todo {
+// 	allCompletedRecords := []Todo{}
+// 	db.Where("completed = ?", true).Find(&allCompletedRecords)
+// 	return allCompletedRecords
+// }
+
+// ReadRecord returns a single occurrence given an id
+func (t Todo) ReadRecord(db *gorm.DB, id string) Todo {
+	readRecord := Todo{}
+	db.Where("id=?", id).First(&readRecord)
+	return readRecord
+}
+
+// UpdateRecord updates a row in the database
+func (t Todo) UpdateRecord(db *gorm.DB, id string) {
+	db.Model(&t).Where("id = ?", id).Update("title", t.Title)
+	db.Model(&t).Where("id = ?", id).Update("description", t.Description)
+	db.Model(&t).Where("id = ?", id).Update("deadline", t.Deadline)
+}
+
+// UpdateCompletedRecord updates a row with boolean "Completed" true or false
+func (t Todo) UpdateCompletedRecord(db *gorm.DB, id string) {
+	db.Model(&t).Where("id = ?", id).Update("completed", !t.Completed)
+}
+
+// DeleteRecord removes a single record given an id
+func (t Todo) DeleteRecord(db *gorm.DB, id string) {
+	db.Where("id=?", id).Delete(&t)
+}
+
+//---- DATABASE UUID CREATION METHOD ----//
+
+// BeforeCreate will set a UUID rather than numeric ID.
+func (t *Todo) BeforeCreate(scope *gorm.Scope) error {
+	uuid, err := uuid.NewV4()
+	if err != nil {
+		return err
+	}
+	return scope.SetColumn("ID", uuid)
+}
+
+//---- FRONT END METHODS ----//
 
 // MonthFormatted converts type Month to type Int
 func (t Todo) MonthFormatted() string {

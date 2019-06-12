@@ -122,7 +122,7 @@ body {
     padding-left: 70px !important;
 }
 
-.wwc-completed-check {
+.wwc-complete-check {
     margin: 0 18px;
 }
 
@@ -190,4 +190,29 @@ body {
 
 .wwc-task-name .fa-check-circle:hover {
     opacity: 1;
+    color: green;
 }
+
+.wwc-task-name .fa-times-circle {
+    color: #343a40;
+    opacity: 0.40;
+}
+
+.wwc-task-name .fa-times-circle:hover {
+    opacity: 1;
+    color: red;
+}
+
+.wwc-task-title { color: #72c0db; }
+
+.wwc-task-title:hover { color: #72c0db; }
+
+.wwc-button-remove-task,
+.wwc-button-complete-task {
+    padding: 0;
+    border: none;
+}
+
+.wwc-form-remove-task,
+.wwc-form-complete-task
+{ display: inline; }

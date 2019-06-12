@@ -19,15 +19,32 @@
       <div class="d-flex">
         <a href="/" class="wwc-home-link"><span class="wwc-navbar-brand navbar-brand mb-0 h1 text-white d-flex align-items-center font-size-navbar">ToDo List</span></a>
         <div class="wwc-uncompleted-and-date">
-          <span class="wwc-number-of-incompleted-tasks">4 Incompleted Tasks</span><br>
-          <span class="wwc-today-date">Thursday 06, June 2019</span>
+          <span class="wwc-number-of-incompleted-tasks">{{ .PendingTasksNumber }} Incompleted Tasks</span><br>
+          <span class="wwc-today-date">{{.CurrentDateTime.Weekday}} {{.CurrentDateTime.Day}}, {{.CurrentDateTime.Month}} {{.CurrentDateTime.Year}}</span>
         </div>
       </div>
 
       <div>
         <ul class="d-flex align-items-center list-unstyled m-0">
-          <li><a href="/" class="text-white wwc-nav-link wwc-nav-first-link wwc-active-link">Incomplete Tasks</a></li>
-          <li><a href="/" class="text-white wwc-nav-link">Completed Tasks</a></li>
+
+          {{ if and (not .FilterStatus.Completed) (not .FilterStatus.Incompleted) }}
+          <li><a href="/" class="text-white wwc-nav-link wwc-nav-first-link wwc-active-link">All Tasks</a></li>
+          {{ else }}
+          <li><a href="/" class="text-white wwc-nav-link wwc-nav-first-link">All Tasks</a></li>
+          {{ end }}
+
+          {{ if .FilterStatus.Incompleted }}
+          <li><a href="/?status=incompleted" class="text-white wwc-nav-link wwc-nav-first-link wwc-active-link">Incompleted Tasks</a></li>
+          {{ else }}
+          <li><a href="/?status=incompleted" class="text-white wwc-nav-link wwc-nav-first-link">Incompleted Tasks</a></li>
+          {{ end }}
+
+          {{ if .FilterStatus.Completed }}
+          <li><a href="/?status=completed" class="text-white wwc-nav-link wwc-nav-first-link wwc-active-link">Completed Tasks</a></li>
+          {{ else }}
+          <li><a href="/?status=completed" class="text-white wwc-nav-link wwc-nav-first-link">Completed Tasks</a></li>
+          {{ end }}
+          
         </ul>
       </div>
     </nav>
@@ -44,32 +61,47 @@
             <th class="wwc-task-date-and-actions">Actions</th>
           </tr>
         </thead>
-        {{if .Title}}
+        {{range $task := .TasksArray}}
         <tbody>
           <tr>
             <td class="wwc-task-name">
-              {{if .Completed}}
-              <a href="/completed{{.EncodeQueryURL}}&completed=false" class="wwc-completed-check"><i class="far fa-check-circle wwc-txt-green"></i></a>
-              {{else}}
-              <a href="/completed{{.EncodeQueryURL}}&completed=true" class="wwc-completed-check"><i class="far fa-check-circle"></i></a>
-              {{end}}              
-              <span>{{.Title}}</span>
+              {{ if $task.Completed}}
+                {{ if $.FilterStatus.Completed }}
+              <a class="wwc-complete-check" href="/complete?status=completed&id={{$task.ID}}"><i class="far fa-times-circle"></i></a>
+                {{ else }}
+              <a class="wwc-complete-check" href="/complete?id={{$task.ID}}"><i class="far fa-times-circle"></i></a>
+                {{ end }}
+              {{ else }}
+                {{ if $.FilterStatus.Incompleted }}
+              <a class="wwc-complete-check" href="/complete?status=incompleted&id={{$task.ID}}"><i class="far fa-check-circle"></i></a>
+                {{ else }}
+                <a class="wwc-complete-check" href="/complete?id={{$task.ID}}"><i class="far fa-check-circle"></i></a>
+                {{ end }}
+              {{ end }}
+              <a href="/show?id={{$task.ID}}" class="wwc-task-title">{{$task.Title}}</a>
             </td>
-            <td class="wwc-task-date-and-actions">{{.Deadline.UTC.Day}} {{.Deadline.UTC.Month}} {{.Deadline.UTC.Year}}</td>
+            <td class="wwc-task-date-and-actions">{{$task.Deadline.UTC.Day}} {{$task.Deadline.UTC.Month}} {{$task.Deadline.UTC.Year}}</td>
             <td class="wwc-task-date-and-actions">
-              {{if .Completed}}
-              <a href="/edit{{.EncodeQueryURL}}&completed=true" class="wwc-edit-item"><i class="fas fa-pencil-alt"></i></a>
+
+              {{if $task.Completed}}
+              <a href="/edit?id={{$task.ID}}" class="wwc-edit-item"><i class="fas fa-pencil-alt"></i></a>
               {{else}}
-              <a href="/edit{{.EncodeQueryURL}}&completed=false" class="wwc-edit-item"><i class="fas fa-pencil-alt"></i></a>
+              <a href="/edit?id={{$task.ID}}" class="wwc-edit-item"><i class="fas fa-pencil-alt"></i></a>
               {{end}}
-              <a href="/delete"><i class="far fa-trash-alt"></i></a>
+
+              {{ if $.FilterStatus.Completed }}
+              <a href="/delete?status=completed&id={{$task.ID}}"><i class="far fa-trash-alt"></i></a>
+              {{ else if $.FilterStatus.Incompleted }}
+              <a href="/delete?status=incompleted&id={{$task.ID}}"><i class="far fa-trash-alt"></i></a>
+              {{ else }}
+              <a href="/delete?id={{$task.ID}}"><i class="far fa-trash-alt"></i></a>
+              {{end}}
             </td>
           </tr>
         </tbody>
         {{end}}
       </table>
     </div>
-
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>

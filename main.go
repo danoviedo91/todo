@@ -16,9 +16,11 @@ func main() {
 	http.HandleFunc("/", actions.Index)
 	http.HandleFunc("/new", actions.New)
 	http.HandleFunc("/create", actions.Create)
-	http.HandleFunc("/edit", actions.Edit)
 	http.HandleFunc("/delete", actions.Delete)
-	http.HandleFunc("/completed", actions.Completed)
+	http.HandleFunc("/edit", actions.Edit)
+	http.HandleFunc("/update", actions.Update)
+	http.HandleFunc("/show", actions.Show)
+	http.HandleFunc("/complete", actions.Complete)
 
 	http.ListenAndServe(":3000", nil)
 }

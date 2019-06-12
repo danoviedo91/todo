@@ -19,14 +19,15 @@
       <div class="d-flex">
         <a href="/" class="wwc-home-link"><span class="wwc-navbar-brand navbar-brand mb-0 h1 text-white d-flex align-items-center font-size-navbar">ToDo List</span></a>
         <div class="wwc-uncompleted-and-date">
-          <span class="wwc-number-of-incompleted-tasks">4 Incompleted Tasks</span><br>
-          <span class="wwc-today-date">Thursday 06, June 2019</span>
+          <span class="wwc-number-of-incompleted-tasks">{{ .PendingTasksNumber }} Incompleted Tasks</span><br>
+          <span class="wwc-today-date">{{.CurrentDateTime.Weekday}} {{.CurrentDateTime.Day}}, {{.CurrentDateTime.Month}} {{.CurrentDateTime.Year}}</span>
         </div>
       </div>
       <div id="wwc-navigation-links">
         <ul class="d-flex align-items-center list-unstyled m-0">
-          <li><a href="/" class="text-white wwc-nav-link wwc-nav-first-link">Incomplete Tasks</a></li>
-          <li><a href="/" class="text-white wwc-nav-link">Completed Tasks</a></li>
+          <li><a href="/" class="text-white wwc-nav-link wwc-nav-first-link">All Tasks</a></li>
+          <li><a href="/?status=incomplete" class="text-white wwc-nav-link wwc-nav-first-link">Incomplete Tasks</a></li>
+          <li><a href="/?status=complete" class="text-white wwc-nav-link">Completed Tasks</a></li>
         </ul>
       </div>
     </nav>

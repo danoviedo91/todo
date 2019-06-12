@@ -5,17 +5,71 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-	"net/url"
 	"strconv"
 	"time"
 
+	db "github.com/danoviedo91/todo/database"
 	"github.com/danoviedo91/todo/models"
-	//"github.com/jinzhu/gorm"
-	//_ "github.com/jinzhu/gorm/dialects/postgres" //postgres database driver
+	_ "github.com/jinzhu/gorm/dialects/postgres" //postgres database driver
 )
 
 // Index is used to parse index.html the first time user enters the website
 func Index(w http.ResponseWriter, r *http.Request) {
+
+	// queryValues gets all GET parameters sent with the URL
+	queryValues := r.URL.Query()
+
+	// Establish database connection
+	db := db.Connect()
+	defer db.Close()
+
+	// Declare empty struct for giving db the needed structure
+	todo := models.Todo{}
+
+	// Initialize database-query variables
+
+	allRecords := todo.ReadAll(db)
+	records := []models.Todo{}
+	incompletedTasks := 0
+	filterStatus := models.FilterStatus{}
+
+	// If /?completed=true
+
+	if queryValues.Get("status") == "completed" {
+		for _, row := range allRecords {
+			if row.Completed == true {
+				records = append(records, row)
+			}
+		}
+		incompletedTasks = len(allRecords) - len(records)
+		filterStatus.Completed = true
+		// If /?completed=false
+	} else if queryValues.Get("status") == "incompleted" {
+		for _, row := range allRecords {
+			if row.Completed == false {
+				records = append(records, row)
+			}
+		}
+		incompletedTasks = len(records)
+		filterStatus.Incompleted = true
+		// If /
+	} else {
+		for _, row := range allRecords {
+			if row.Completed == false {
+				records = append(records, row)
+			}
+		}
+		incompletedTasks = len(records)
+		records = allRecords
+	}
+
+	// Prepare to send data to template
+
+	templateData := models.TemplateData{}
+	templateData.PendingTasksNumber = incompletedTasks
+	templateData.CurrentDateTime = time.Now()
+	templateData.TasksArray = records
+	templateData.FilterStatus = filterStatus
 
 	// Parse HTML template
 	html, err := template.ParseFiles("templates/todos/index.html")
@@ -23,7 +77,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 
-	err = html.Execute(w, nil)
+	err = html.Execute(w, templateData)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -33,13 +87,39 @@ func Index(w http.ResponseWriter, r *http.Request) {
 // New parses new.html which contains form submission
 func New(w http.ResponseWriter, r *http.Request) {
 
+	// Establish database connection
+	db := db.Connect()
+	defer db.Close()
+
+	// Declare empty struct for giving db the needed structure
+	todo := models.Todo{}
+
+	// Initialize database-query variables
+
+	allRecords := todo.ReadAll(db)
+	records := []models.Todo{}
+	incompletedTasks := 0
+
+	for _, row := range allRecords {
+		if row.Completed == false {
+			records = append(records, row)
+		}
+	}
+	incompletedTasks = len(records)
+
+	// Prepare to send data to template
+	templateData := models.TemplateData{}
+
+	templateData.PendingTasksNumber = incompletedTasks
+	templateData.CurrentDateTime = time.Now()
+
 	// Parse HTML template
 	html, err := template.ParseFiles("templates/todos/new.html")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	err = html.Execute(w, nil)
+	err = html.Execute(w, templateData)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -52,8 +132,9 @@ func Create(w http.ResponseWriter, r *http.Request) {
 	// Assign to r the POST information sent with the form
 	r.ParseForm()
 
-	// Declare empty todo struct
-	todo := models.Todo{}
+	// Establish database connection
+	db := db.Connect()
+	defer db.Close()
 
 	// Get Time.time correct format for todo.Deadline
 	layout := "2006-01-02"
@@ -63,24 +144,38 @@ func Create(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 	}
 
+	// Declare empty struct for giving db the needed structure
+	todo := models.Todo{}
+
 	// Assign values to todo struct
 	todo.Deadline = duedate
 	todo.Description = r.FormValue("todo-description")
 	todo.Title = r.FormValue("todo-title")
 	todo.Completed, err = strconv.ParseBool(r.FormValue("todo-completed"))
 
-	if err != nil {
-		fmt.Println(err)
+	// Insert record into the database
+	todo.Create(db)
+
+	// Initialize database-query variables
+
+	allRecords := todo.ReadAll(db)
+	records := []models.Todo{}
+	incompletedTasks := 0
+
+	for _, row := range allRecords {
+		if row.Completed == false {
+			records = append(records, row)
+		}
 	}
+	incompletedTasks = len(records)
+	records = allRecords
 
-	//Establish database connection
+	// Prepare to send data to template
 
-	// db, err := gorm.Open("postgres", "host=localhost port=5432 user=postgres dbname=todo password=root")
-	// defer db.Close()
-
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
+	templateData := models.TemplateData{}
+	templateData.PendingTasksNumber = incompletedTasks
+	templateData.CurrentDateTime = time.Now()
+	templateData.TasksArray = records
 
 	//Parse HTML template
 	html, err := template.ParseFiles("templates/todos/index.html")
@@ -88,7 +183,163 @@ func Create(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 
-	err = html.Execute(w, todo)
+	err = html.Execute(w, templateData)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+}
+
+// Delete removes the record
+func Delete(w http.ResponseWriter, r *http.Request) {
+
+	// queryValues gets all GET parameters sent with the URL
+	queryValues := r.URL.Query()
+
+	// Catch the id
+	id := queryValues.Get("id")
+
+	// Establish database connection
+	db := db.Connect()
+	defer db.Close()
+
+	// Declare empty struct for giving db the needed structure
+	todo := models.Todo{}
+
+	// Delete record given the id
+	todo.DeleteRecord(db, id)
+
+	// Initialize database-query variables
+
+	allRecords := todo.ReadAll(db)
+	records := []models.Todo{}
+	incompletedTasks := 0
+	filterStatus := models.FilterStatus{}
+
+	// If /?completed=true
+
+	if queryValues.Get("status") == "completed" {
+		for _, row := range allRecords {
+			if row.Completed == true {
+				records = append(records, row)
+			}
+		}
+		incompletedTasks = len(allRecords) - len(records)
+		filterStatus.Completed = true
+		// If /?completed=false
+	} else if queryValues.Get("status") == "incompleted" {
+		for _, row := range allRecords {
+			if row.Completed == false {
+				records = append(records, row)
+			}
+		}
+		incompletedTasks = len(records)
+		filterStatus.Incompleted = true
+		// If /
+	} else {
+		for _, row := range allRecords {
+			if row.Completed == false {
+				records = append(records, row)
+			}
+		}
+		incompletedTasks = len(records)
+		records = allRecords
+	}
+
+	// Prepare to send data to template
+
+	templateData := models.TemplateData{}
+	templateData.PendingTasksNumber = incompletedTasks
+	templateData.CurrentDateTime = time.Now()
+	templateData.TasksArray = records
+	templateData.FilterStatus = filterStatus
+
+	// Parse HTML template
+	html, err := template.ParseFiles("templates/todos/index.html")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = html.Execute(w, templateData)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+// Complete marks item as completed or incomplete
+func Complete(w http.ResponseWriter, r *http.Request) {
+
+	// queryValues gets all GET parameters sent with the URL
+	queryValues := r.URL.Query()
+
+	// Catch the id
+	id := r.FormValue("id")
+
+	// Declare empty struct for giving db the needed structure
+	todo := models.Todo{}
+
+	// Establish database connection
+	db := db.Connect()
+	defer db.Close()
+
+	// Catch the struct to be edited
+	todo = todo.ReadRecord(db, id)
+
+	// Update record into the database
+	todo.UpdateCompletedRecord(db, id)
+
+	// Initialize database-query variables
+
+	allRecords := todo.ReadAll(db)
+	records := []models.Todo{}
+	incompletedTasks := 0
+	filterStatus := models.FilterStatus{}
+
+	// If /?completed=true
+
+	if queryValues.Get("status") == "completed" {
+		for _, row := range allRecords {
+			if row.Completed == true {
+				records = append(records, row)
+			}
+		}
+		incompletedTasks = len(allRecords) - len(records)
+		filterStatus.Completed = true
+		// If /?completed=false
+	} else if queryValues.Get("status") == "incompleted" {
+		for _, row := range allRecords {
+			if row.Completed == false {
+				records = append(records, row)
+			}
+		}
+		incompletedTasks = len(records)
+		filterStatus.Incompleted = true
+		// If /
+	} else {
+		for _, row := range allRecords {
+			if row.Completed == false {
+				records = append(records, row)
+			}
+		}
+		incompletedTasks = len(records)
+		records = allRecords
+	}
+
+	// Prepare to send data to template
+
+	templateData := models.TemplateData{}
+	templateData.PendingTasksNumber = incompletedTasks
+	templateData.CurrentDateTime = time.Now()
+	templateData.TasksArray = records
+	templateData.FilterStatus = filterStatus
+
+	// Parse HTML template
+	html, err := template.ParseFiles("templates/todos/index.html")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = html.Execute(w, templateData)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -100,27 +351,38 @@ func Edit(w http.ResponseWriter, r *http.Request) {
 	// queryValues gets all GET parameters sent with the URL
 	queryValues := r.URL.Query()
 
-	// Assign true or false to todo.Completed
-	completed, _ := strconv.ParseBool(queryValues.Get("completed"))
+	// Establish database connection
+	db := db.Connect()
+	defer db.Close()
 
-	todo := models.Todo{
-		Completed: completed,
+	// Declare empty struct for giving db the needed structure
+	todo := models.Todo{}
+
+	// Catch the id
+	id := queryValues.Get("id")
+
+	// Catch the struct to be edited
+	taskToBeEdited := todo.ReadRecord(db, id)
+
+	// Initialize database-query variables
+
+	allRecords := todo.ReadAll(db)
+	records := []models.Todo{}
+	incompletedTasks := 0
+
+	for _, row := range allRecords {
+		if row.Completed == false {
+			records = append(records, row)
+		}
 	}
+	incompletedTasks = len(records)
 
-	// Get Time.time correct format for todo.Deadline
-	layout := "01/02/2006"
-	duedateDecoded, _ := url.QueryUnescape(queryValues.Get("limitdate"))
-	duedate, err := time.Parse(layout, duedateDecoded)
+	// Prepare to send data to template
+	templateData := models.TemplateData{}
 
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	// Assign values to todo struct
-
-	todo.Title, _ = url.QueryUnescape(queryValues.Get("title"))
-	todo.Description, _ = url.QueryUnescape(queryValues.Get("description"))
-	todo.Deadline = duedate
+	templateData.PendingTasksNumber = incompletedTasks
+	templateData.CurrentDateTime = time.Now()
+	templateData.TaskStruct = taskToBeEdited
 
 	// Parse HTML template
 	html, err := template.ParseFiles("templates/todos/edit.html")
@@ -128,66 +390,124 @@ func Edit(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 
-	err = html.Execute(w, todo)
+	err = html.Execute(w, templateData)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 }
 
-// Delete removes the record
-func Delete(w http.ResponseWriter, r *http.Request) {
+// Update fills the struct with info and returns it to index.html
+func Update(w http.ResponseWriter, r *http.Request) {
 
-	// todo gets cleared out
+	// Assign to r the POST information sent with the form
+	r.ParseForm()
+
+	// Establish database connection
+	db := db.Connect()
+	defer db.Close()
+
+	// Declare empty struct for giving db the needed structure
 	todo := models.Todo{}
 
-	// Parse HTML template
-	html, err := template.ParseFiles("templates/todos/index.html")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = html.Execute(w, todo)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-// Completed marks item as completed or incomplete
-func Completed(w http.ResponseWriter, r *http.Request) {
-
-	// queryValues gets all GET parameters sent with the URL
-	queryValues := r.URL.Query()
-
-	// Assign true or false to todo.Completed
-	completed, _ := strconv.ParseBool(queryValues.Get("completed"))
-
-	todo := models.Todo{
-		Completed: completed,
-	}
-
 	// Get Time.time correct format for todo.Deadline
-
-	layout := "01/02/2006"
-	duedateDecoded, _ := url.QueryUnescape(queryValues.Get("limitdate"))
-	duedate, err := time.Parse(layout, duedateDecoded)
+	layout := "2006-01-02"
+	duedate, err := time.Parse(layout, r.FormValue("todo-date"))
 
 	if err != nil {
 		fmt.Println(err)
 	}
 
 	// Assign values to todo struct
-	todo.Title, _ = url.QueryUnescape(queryValues.Get("title"))
-	todo.Description, _ = url.QueryUnescape(queryValues.Get("description"))
+	id := r.FormValue("todo-id")
 	todo.Deadline = duedate
+	todo.Description = r.FormValue("todo-description")
+	todo.Title = r.FormValue("todo-title")
+	todo.Completed, err = strconv.ParseBool(r.FormValue("todo-completed"))
 
-	// Parse HTML template
+	// Update record into the database
+	todo.UpdateRecord(db, id)
+
+	// Initialize database-query variables
+
+	allRecords := todo.ReadAll(db)
+	records := []models.Todo{}
+	incompletedTasks := 0
+
+	for _, row := range allRecords {
+		if row.Completed == false {
+			records = append(records, row)
+		}
+	}
+	incompletedTasks = len(records)
+	records = allRecords
+
+	// Prepare to send data to template
+
+	templateData := models.TemplateData{}
+	templateData.PendingTasksNumber = incompletedTasks
+	templateData.CurrentDateTime = time.Now()
+	templateData.TasksArray = records
+
+	//Parse HTML template
 	html, err := template.ParseFiles("templates/todos/index.html")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	err = html.Execute(w, todo)
+	err = html.Execute(w, templateData)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+}
+
+// Show marks item as completed or incomplete
+func Show(w http.ResponseWriter, r *http.Request) {
+
+	// queryValues gets all GET parameters sent with the URL
+	queryValues := r.URL.Query()
+
+	// Establish database connection
+	db := db.Connect()
+	defer db.Close()
+
+	// Catch the id
+	id := queryValues.Get("id")
+
+	// Declare empty struct for giving db the needed structure
+	todo := models.Todo{}
+
+	// Catch the struct to be edited
+	taskToBeShowed := todo.ReadRecord(db, id)
+
+	// Initialize database-query variables
+
+	allRecords := todo.ReadAll(db)
+	records := []models.Todo{}
+	incompletedTasks := 0
+
+	for _, row := range allRecords {
+		if row.Completed == false {
+			records = append(records, row)
+		}
+	}
+	incompletedTasks = len(records)
+
+	// Prepare to send data to template
+	templateData := models.TemplateData{}
+
+	templateData.PendingTasksNumber = incompletedTasks
+	templateData.CurrentDateTime = time.Now()
+	templateData.TaskStruct = taskToBeShowed
+
+	// Parse HTML template
+	html, err := template.ParseFiles("templates/todos/show.html")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = html.Execute(w, templateData)
 	if err != nil {
 		log.Fatal(err)
 	}
