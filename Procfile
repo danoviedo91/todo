@@ -1,1 +1,1 @@
-dany-todo-app
+web: bin/dany-todo-app
