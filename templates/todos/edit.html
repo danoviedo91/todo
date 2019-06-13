@@ -26,8 +26,8 @@
       <div id="wwc-navigation-links">
         <ul class="d-flex align-items-center list-unstyled m-0">
           <li><a href="/" class="text-white wwc-nav-link wwc-nav-first-link">All Tasks</a></li>
-          <li><a href="/?status=incomplete" class="text-white wwc-nav-link wwc-nav-first-link">Incomplete Tasks</a></li>
-          <li><a href="/?status=complete" class="text-white wwc-nav-link">Completed Tasks</a></li>
+          <li><a href="/?status=incompleted" class="text-white wwc-nav-link wwc-nav-first-link">Incompleted Tasks</a></li>
+          <li><a href="/?status=completed" class="text-white wwc-nav-first-link wwc-nav-link">Completed Tasks</a></li>
         </ul>
       </div>
     </nav>
@@ -51,8 +51,18 @@
         <label for="todo-id">Id</label>
         <input name="todo-id" type="text" class="form-control" id="todo-id" value="{{.TaskStruct.ID}}">
       </div>
+      <div class="form-group wwc-hidden">
+        <label for="todo-completed">Completed</label>
+        <input name="todo-completed" type="text" class="form-control" id="todo-completed" value="{{.TaskStruct.Completed}}">
+      </div>
 			<div class="d-flex justify-content-end">
-				<a class="btn wwc-cancel-btn" href="/">Cancel</a>
+        {{ if .FilterStatus.Completed }}
+        <a class="btn wwc-cancel-btn" href="/?status=completed">Cancel</a>
+        {{ else if .FilterStatus.Incompleted }}
+        <a class="btn wwc-cancel-btn" href="/?status=incompleted">Cancel</a>
+        {{ else }}
+        <a class="btn wwc-cancel-btn" href="/">Cancel</a>
+        {{ end }}
 				<button type="submit" class="btn text-white wwc-create-task-btn">Edit Task</button>
 			</div>
     </form>

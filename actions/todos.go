@@ -31,7 +31,13 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	allRecords := todo.ReadAll(db)
 	records := []models.Todo{}
 	incompletedTasks := 0
-	filterStatus := models.FilterStatus{}
+	filterStatus := struct {
+		Incompleted bool
+		Completed   bool
+	}{
+		false,
+		false,
+	}
 
 	// If /?completed=true
 
@@ -65,11 +71,21 @@ func Index(w http.ResponseWriter, r *http.Request) {
 
 	// Prepare to send data to template
 
-	templateData := models.TemplateData{}
-	templateData.PendingTasksNumber = incompletedTasks
-	templateData.CurrentDateTime = time.Now()
-	templateData.TasksArray = records
-	templateData.FilterStatus = filterStatus
+	templateData := struct {
+		PendingTasksNumber int
+		CurrentDateTime    time.Time
+		TasksArray         []models.Todo
+		TaskStruct         models.Todo
+		FilterStatus       struct {
+			Incompleted bool
+			Completed   bool
+		}
+	}{
+		PendingTasksNumber: incompletedTasks,
+		CurrentDateTime:    time.Now(),
+		TasksArray:         records,
+		FilterStatus:       filterStatus,
+	}
 
 	// Parse HTML template
 	html, err := template.ParseFiles("templates/todos/index.html")
@@ -86,6 +102,9 @@ func Index(w http.ResponseWriter, r *http.Request) {
 
 // New parses new.html which contains form submission
 func New(w http.ResponseWriter, r *http.Request) {
+
+	// queryValues gets all GET parameters sent with the URL
+	queryValues := r.URL.Query()
 
 	// Establish database connection
 	db := db.Connect()
@@ -107,11 +126,38 @@ func New(w http.ResponseWriter, r *http.Request) {
 	}
 	incompletedTasks = len(records)
 
-	// Prepare to send data to template
-	templateData := models.TemplateData{}
+	filterStatus := struct {
+		Incompleted bool
+		Completed   bool
+	}{
+		false,
+		false,
+	}
 
-	templateData.PendingTasksNumber = incompletedTasks
-	templateData.CurrentDateTime = time.Now()
+	if queryValues.Get("status") == "completed" {
+		// If /?completed=true
+		filterStatus.Completed = true
+	} else if queryValues.Get("status") == "incompleted" {
+		// If /?completed=false
+		filterStatus.Incompleted = true
+	}
+
+	// Prepare to send data to template
+
+	templateData := struct {
+		PendingTasksNumber int
+		CurrentDateTime    time.Time
+		TasksArray         []models.Todo
+		TaskStruct         models.Todo
+		FilterStatus       struct {
+			Incompleted bool
+			Completed   bool
+		}
+	}{
+		PendingTasksNumber: incompletedTasks,
+		CurrentDateTime:    time.Now(),
+		FilterStatus:       filterStatus,
+	}
 
 	// Parse HTML template
 	html, err := template.ParseFiles("templates/todos/new.html")
@@ -168,17 +214,27 @@ func Create(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	incompletedTasks = len(records)
-	records = allRecords
+	taskToBeShowed := todo
 
 	// Prepare to send data to template
 
-	templateData := models.TemplateData{}
-	templateData.PendingTasksNumber = incompletedTasks
-	templateData.CurrentDateTime = time.Now()
-	templateData.TasksArray = records
+	templateData := struct {
+		PendingTasksNumber int
+		CurrentDateTime    time.Time
+		TasksArray         []models.Todo
+		TaskStruct         models.Todo
+		FilterStatus       struct {
+			Incompleted bool
+			Completed   bool
+		}
+	}{
+		PendingTasksNumber: incompletedTasks,
+		CurrentDateTime:    time.Now(),
+		TaskStruct:         taskToBeShowed,
+	}
 
 	//Parse HTML template
-	html, err := template.ParseFiles("templates/todos/index.html")
+	html, err := template.ParseFiles("templates/todos/show.html")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -214,7 +270,13 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 	allRecords := todo.ReadAll(db)
 	records := []models.Todo{}
 	incompletedTasks := 0
-	filterStatus := models.FilterStatus{}
+	filterStatus := struct {
+		Incompleted bool
+		Completed   bool
+	}{
+		false,
+		false,
+	}
 
 	// If /?completed=true
 
@@ -248,11 +310,21 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 
 	// Prepare to send data to template
 
-	templateData := models.TemplateData{}
-	templateData.PendingTasksNumber = incompletedTasks
-	templateData.CurrentDateTime = time.Now()
-	templateData.TasksArray = records
-	templateData.FilterStatus = filterStatus
+	templateData := struct {
+		PendingTasksNumber int
+		CurrentDateTime    time.Time
+		TasksArray         []models.Todo
+		TaskStruct         models.Todo
+		FilterStatus       struct {
+			Incompleted bool
+			Completed   bool
+		}
+	}{
+		PendingTasksNumber: incompletedTasks,
+		CurrentDateTime:    time.Now(),
+		TasksArray:         records,
+		FilterStatus:       filterStatus,
+	}
 
 	// Parse HTML template
 	html, err := template.ParseFiles("templates/todos/index.html")
@@ -293,7 +365,13 @@ func Complete(w http.ResponseWriter, r *http.Request) {
 	allRecords := todo.ReadAll(db)
 	records := []models.Todo{}
 	incompletedTasks := 0
-	filterStatus := models.FilterStatus{}
+	filterStatus := struct {
+		Incompleted bool
+		Completed   bool
+	}{
+		false,
+		false,
+	}
 
 	// If /?completed=true
 
@@ -327,11 +405,21 @@ func Complete(w http.ResponseWriter, r *http.Request) {
 
 	// Prepare to send data to template
 
-	templateData := models.TemplateData{}
-	templateData.PendingTasksNumber = incompletedTasks
-	templateData.CurrentDateTime = time.Now()
-	templateData.TasksArray = records
-	templateData.FilterStatus = filterStatus
+	templateData := struct {
+		PendingTasksNumber int
+		CurrentDateTime    time.Time
+		TasksArray         []models.Todo
+		TaskStruct         models.Todo
+		FilterStatus       struct {
+			Incompleted bool
+			Completed   bool
+		}
+	}{
+		PendingTasksNumber: incompletedTasks,
+		CurrentDateTime:    time.Now(),
+		TasksArray:         records,
+		FilterStatus:       filterStatus,
+	}
 
 	// Parse HTML template
 	html, err := template.ParseFiles("templates/todos/index.html")
@@ -377,12 +465,39 @@ func Edit(w http.ResponseWriter, r *http.Request) {
 	}
 	incompletedTasks = len(records)
 
-	// Prepare to send data to template
-	templateData := models.TemplateData{}
+	filterStatus := struct {
+		Incompleted bool
+		Completed   bool
+	}{
+		false,
+		false,
+	}
 
-	templateData.PendingTasksNumber = incompletedTasks
-	templateData.CurrentDateTime = time.Now()
-	templateData.TaskStruct = taskToBeEdited
+	if queryValues.Get("status") == "completed" {
+		// If /?completed=true
+		filterStatus.Completed = true
+	} else if queryValues.Get("status") == "incompleted" {
+		// If /?completed=false
+		filterStatus.Incompleted = true
+	}
+
+	// Prepare to send data to template
+
+	templateData := struct {
+		PendingTasksNumber int
+		CurrentDateTime    time.Time
+		TasksArray         []models.Todo
+		TaskStruct         models.Todo
+		FilterStatus       struct {
+			Incompleted bool
+			Completed   bool
+		}
+	}{
+		PendingTasksNumber: incompletedTasks,
+		CurrentDateTime:    time.Now(),
+		TaskStruct:         taskToBeEdited,
+		FilterStatus:       filterStatus,
+	}
 
 	// Parse HTML template
 	html, err := template.ParseFiles("templates/todos/edit.html")
@@ -440,17 +555,27 @@ func Update(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	incompletedTasks = len(records)
-	records = allRecords
+	taskToBeShowed := todo
 
 	// Prepare to send data to template
 
-	templateData := models.TemplateData{}
-	templateData.PendingTasksNumber = incompletedTasks
-	templateData.CurrentDateTime = time.Now()
-	templateData.TasksArray = records
+	templateData := struct {
+		PendingTasksNumber int
+		CurrentDateTime    time.Time
+		TasksArray         []models.Todo
+		TaskStruct         models.Todo
+		FilterStatus       struct {
+			Incompleted bool
+			Completed   bool
+		}
+	}{
+		PendingTasksNumber: incompletedTasks,
+		CurrentDateTime:    time.Now(),
+		TaskStruct:         taskToBeShowed,
+	}
 
 	//Parse HTML template
-	html, err := template.ParseFiles("templates/todos/index.html")
+	html, err := template.ParseFiles("templates/todos/show.html")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -494,12 +619,39 @@ func Show(w http.ResponseWriter, r *http.Request) {
 	}
 	incompletedTasks = len(records)
 
-	// Prepare to send data to template
-	templateData := models.TemplateData{}
+	filterStatus := struct {
+		Incompleted bool
+		Completed   bool
+	}{
+		false,
+		false,
+	}
 
-	templateData.PendingTasksNumber = incompletedTasks
-	templateData.CurrentDateTime = time.Now()
-	templateData.TaskStruct = taskToBeShowed
+	if queryValues.Get("status") == "completed" {
+		// If /?completed=true
+		filterStatus.Completed = true
+	} else if queryValues.Get("status") == "incompleted" {
+		// If /?completed=false
+		filterStatus.Incompleted = true
+	}
+
+	// Prepare to send data to template
+
+	templateData := struct {
+		PendingTasksNumber int
+		CurrentDateTime    time.Time
+		TasksArray         []models.Todo
+		TaskStruct         models.Todo
+		FilterStatus       struct {
+			Incompleted bool
+			Completed   bool
+		}
+	}{
+		PendingTasksNumber: incompletedTasks,
+		CurrentDateTime:    time.Now(),
+		TaskStruct:         taskToBeShowed,
+		FilterStatus:       filterStatus,
+	}
 
 	// Parse HTML template
 	html, err := template.ParseFiles("templates/todos/show.html")

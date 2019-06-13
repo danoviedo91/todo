@@ -19,23 +19,6 @@ type Todo struct {
 	Completed   bool      `gorm:"type:bool"`
 }
 
-//---- TemplateData MODEL ----//
-
-// TemplateData is used to send data to the HTML template
-type TemplateData struct {
-	PendingTasksNumber int
-	CurrentDateTime    time.Time
-	TasksArray         []Todo
-	TaskStruct         Todo
-	FilterStatus
-}
-
-// FilterStatus gets true or false depending on query string from /?completed=
-type FilterStatus struct {
-	Incompleted bool
-	Completed   bool
-}
-
 //---- DATABASE CRUD OPERATIONS (METHODS) ----//
 
 // Create inserts a row in the database
@@ -49,20 +32,6 @@ func (t Todo) ReadAll(db *gorm.DB) []Todo {
 	db.Find(&allUncompletedRecords)
 	return allUncompletedRecords
 }
-
-// ReadAllUncomplete returns all the tasks which are NOT complete
-// func (t Todo) ReadAllUncomplete(db *gorm.DB) []Todo {
-// 	allUncompletedRecords := []Todo{}
-// 	db.Where("completed = ?", false).Find(&allUncompletedRecords)
-// 	return allUncompletedRecords
-// }
-
-// ReadAllComplete returns all the tasks which ARE complete
-// func (t Todo) ReadAllComplete(db *gorm.DB) []Todo {
-// 	allCompletedRecords := []Todo{}
-// 	db.Where("completed = ?", true).Find(&allCompletedRecords)
-// 	return allCompletedRecords
-// }
 
 // ReadRecord returns a single occurrence given an id
 func (t Todo) ReadRecord(db *gorm.DB, id string) Todo {

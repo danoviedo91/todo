@@ -216,3 +216,7 @@ body {
 .wwc-form-remove-task,
 .wwc-form-complete-task
 { display: inline; }
+
+.wwc-confirm-delete-btn {
+    background:#72c0db !important;
+}
