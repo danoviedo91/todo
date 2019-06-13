@@ -1,3 +1,3 @@
-module "https://github.com/danoviedo91/todo"
+module "https://git.heroku.com/dany-todo-app.git"
 
 go 1.12
