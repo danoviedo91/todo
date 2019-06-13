@@ -73,15 +73,15 @@
 
               {{ if $task.Completed}}
                 {{ if $.FilterStatus.Completed }}
-              <a class="wwc-complete-check" href="/complete?status=completed&id={{$task.ID}}"><i class="far fa-times-circle"></i></a>
+              <a class="wwc-complete-check wwc-task-completed" href="/complete?status=completed&id={{$task.ID}}"><i class="far fa-check-circle"></i></a>
                 {{ else }}
-              <a class="wwc-complete-check" href="/complete?id={{$task.ID}}"><i class="far fa-times-circle"></i></a>
+              <a class="wwc-complete-check wwc-task-completed" href="/complete?id={{$task.ID}}"><i class="far fa-check-circle"></i></a>
                 {{ end }}
               {{ else }}
                 {{ if $.FilterStatus.Incompleted }}
-              <a class="wwc-complete-check" href="/complete?status=incompleted&id={{$task.ID}}"><i class="far fa-check-circle"></i></a>
+              <a class="wwc-complete-check wwc-task-incompleted" href="/complete?status=incompleted&id={{$task.ID}}"><i class="far fa-check-circle"></i></a>
                 {{ else }}
-                <a class="wwc-complete-check" href="/complete?id={{$task.ID}}"><i class="far fa-check-circle"></i></a>
+                <a class="wwc-complete-check wwc-task-incompleted" href="/complete?id={{$task.ID}}"><i class="far fa-check-circle"></i></a>
                 {{ end }}
               {{ end }}
               

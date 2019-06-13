@@ -187,16 +187,6 @@ body {
     opacity: 1;
 }
 
-.wwc-task-name .fa-check-circle {
-    color: #343a40;
-    opacity: 0.40;
-}
-
-.wwc-task-name .fa-check-circle:hover {
-    opacity: 1;
-    color: green;
-}
-
 .wwc-task-name .fa-times-circle {
     color: #343a40;
     opacity: 0.40;
@@ -223,4 +213,22 @@ body {
 
 .wwc-confirm-delete-btn {
     background:#72c0db !important;
+}
+
+.wwc-task-completed {
+    color: green;
+    opacity: 0.70;
+}
+
+.wwc-task-completed:hover {
+    color: green;
+}
+
+.wwc-task-incompleted {
+    color: #343a40;
+    opacity: 0.70;
+}
+
+.wwc-task-incompleted:hover {
+    color: #343a40;
 }
