@@ -3,8 +3,10 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/danoviedo91/todo/actions"
+	"github.com/joho/godotenv"
 )
 
 func main() {
@@ -23,6 +25,16 @@ func main() {
 	http.HandleFunc("/show", actions.Show)
 	http.HandleFunc("/complete", actions.Complete)
 
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = ":8000"
+	}
+
 	log.Println("Serving...")
-	http.ListenAndServe(":8000", nil)
+	http.ListenAndServe(port, nil)
 }
