@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/danoviedo91/todo/actions"
@@ -22,5 +23,6 @@ func main() {
 	http.HandleFunc("/show", actions.Show)
 	http.HandleFunc("/complete", actions.Complete)
 
-	http.ListenAndServe(":8000", nil)
+	log.Println("Serving...")
+	http.ListenAndServe(":5000", nil)
 }
