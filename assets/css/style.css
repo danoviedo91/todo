@@ -108,18 +108,23 @@ body {
 
 .wwc-task-date-and-actions {
     width: 20%;
+    line-height: 33.5px;
 }
 
 .table .thead-dark th {
     background-color: #194767 !important;
-    padding: 1.15rem .75rem;
+    padding: 0.86rem .75rem;
     font-weight: normal;
 }
 
 .table td {
-    padding: 1.15rem .75rem;
+    padding: 0.86rem .75rem;
     border-top: 1px solid #dee2e6;
     background-color: white;
+}
+
+.wwc-task-name {
+    line-height: 33.5px;
 }
 
 .wwc-thead-first-element {
@@ -128,6 +133,8 @@ body {
 
 .wwc-complete-check {
     margin: 0 18px;
+    font-size: 20px;
+    vertical-align: middle;
 }
 
 .wwc-edit-item {
@@ -197,7 +204,10 @@ body {
     color: red;
 }
 
-.wwc-task-title { color: #72c0db; }
+.wwc-task-title { 
+    color: #72c0db;
+    vertical-align: middle;
+}
 
 .wwc-task-title:hover { color: #72c0db; }
 
@@ -231,4 +241,10 @@ body {
 
 .wwc-task-incompleted:hover {
     color: #343a40;
+}
+
+#wwc-notasks-msg {
+    padding: 48px 20px;
+    text-align: center;
+    color: gray;
 }

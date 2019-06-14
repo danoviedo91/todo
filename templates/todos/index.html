@@ -66,22 +66,39 @@
             <th class="wwc-task-date-and-actions">Actions</th>
           </tr>
         </thead>
+
+        {{ if .DefaultMsgFlag }}
+
+          {{ if .FilterStatus.Completed }}
+
+          <tr><td colspan="3" id="wwc-notasks-msg">No completed tasks to show</td></tr>
+
+          {{ else if .FilterStatus.Incompleted }}
+
+          <tr><td colspan="3" id="wwc-notasks-msg">No incompleted tasks to show</td></tr>
+
+          {{ else }}
+
+          <tr><td colspan="3" id="wwc-notasks-msg">No tasks to show</td></tr>
+
+          {{ end }}
+
+        {{ else }}
+
         {{range $task := .TasksArray}}
         <tbody>
           <tr>
             <td class="wwc-task-name">
 
-              {{ if $task.Completed}}
-                {{ if $.FilterStatus.Completed }}
-              <a class="wwc-complete-check wwc-task-completed" href="/complete?status=completed&id={{$task.ID}}"><i class="far fa-check-circle"></i></a>
-                {{ else }}
-              <a class="wwc-complete-check wwc-task-completed" href="/complete?id={{$task.ID}}"><i class="far fa-check-circle"></i></a>
-                {{ end }}
+              {{ if $.FilterStatus.Completed }}
+                <a class="wwc-complete-check wwc-task-completed" href="/complete?action=incomplete&id={{$task.ID}}&status=completed"><i class="far fa-check-circle"></i></a>
+              {{ else if $.FilterStatus.Incompleted }}
+                <a class="wwc-complete-check wwc-task-incompleted" href="/complete?action=complete&id={{$task.ID}}&status=incompleted"><i class="far fa-check-circle"></i></a>
               {{ else }}
-                {{ if $.FilterStatus.Incompleted }}
-              <a class="wwc-complete-check wwc-task-incompleted" href="/complete?status=incompleted&id={{$task.ID}}"><i class="far fa-check-circle"></i></a>
+                {{ if $task.Completed }}
+                <a class="wwc-complete-check wwc-task-completed" href="/complete?action=incomplete&id={{$task.ID}}"><i class="far fa-check-circle"></i></a>
                 {{ else }}
-                <a class="wwc-complete-check wwc-task-incompleted" href="/complete?id={{$task.ID}}"><i class="far fa-check-circle"></i></a>
+                <a class="wwc-complete-check wwc-task-incompleted" href="/complete?action=complete&id={{$task.ID}}"><i class="far fa-check-circle"></i></a>
                 {{ end }}
               {{ end }}
               
@@ -114,7 +131,7 @@
               {{end}}
             </td>
           </tr>
-        </tbody>
+          {{ end }}
         {{end}}
       </table>
     </div>

@@ -11,11 +11,9 @@ import (
 
 func main() {
 
-	// Serve "assets" folder as root of the server
 	fs := http.FileServer(http.Dir("assets"))
 	http.Handle("/assets/", http.StripPrefix("/assets/", fs))
 
-	// Handlers
 	http.HandleFunc("/", actions.Index)
 	http.HandleFunc("/new", actions.New)
 	http.HandleFunc("/create", actions.Create)
@@ -27,20 +25,9 @@ func main() {
 
 	port := ""
 
-	err := godotenv.Load()
+	_ = godotenv.Load()
 
-	if err != nil {
-		port = ":" + os.Getenv("PORT")
-		log.Println(".env file not detected... using default PORT", port)
-	} else {
-		port = ":" + os.Getenv("PORT")
-		if port == ":" {
-			log.Println("PORT .env variable not detected... using default PORT 8000")
-			port = ":8000"
-		} else {
-			log.Println(".env file set with PORT", port)
-		}
-	}
+	port = ":" + os.Getenv("PORT")
 
 	log.Println("Serving...")
 	http.ListenAndServe(port, nil)

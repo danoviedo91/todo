@@ -69,6 +69,14 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		records = allRecords
 	}
 
+	// Catch if there are tasks to show or not...
+
+	defaultMsgFlag := false
+
+	if len(records) == 0 {
+		defaultMsgFlag = true
+	}
+
 	// Prepare to send data to template
 
 	templateData := struct {
@@ -76,11 +84,13 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		CurrentDateTime    time.Time
 		TasksArray         []models.Todo
 		TaskStruct         models.Todo
+		DefaultMsgFlag     bool
 		FilterStatus       struct {
 			Incompleted bool
 			Completed   bool
 		}
 	}{
+		DefaultMsgFlag:     defaultMsgFlag,
 		PendingTasksNumber: incompletedTasks,
 		CurrentDateTime:    time.Now(),
 		TasksArray:         records,
@@ -307,6 +317,13 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 		incompletedTasks = len(records)
 		records = allRecords
 	}
+	// Catch if there are tasks to show or not...
+
+	defaultMsgFlag := false
+
+	if len(records) == 0 {
+		defaultMsgFlag = true
+	}
 
 	// Prepare to send data to template
 
@@ -315,11 +332,13 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 		CurrentDateTime    time.Time
 		TasksArray         []models.Todo
 		TaskStruct         models.Todo
+		DefaultMsgFlag     bool
 		FilterStatus       struct {
 			Incompleted bool
 			Completed   bool
 		}
 	}{
+		DefaultMsgFlag:     defaultMsgFlag,
 		PendingTasksNumber: incompletedTasks,
 		CurrentDateTime:    time.Now(),
 		TasksArray:         records,
@@ -357,8 +376,11 @@ func Complete(w http.ResponseWriter, r *http.Request) {
 	// Catch the struct to be edited
 	todo = todo.ReadRecord(db, id)
 
+	// Get action query variable
+	action := r.FormValue("action")
+
 	// Update record into the database
-	todo.UpdateCompletedRecord(db, id)
+	todo.UpdateCompletedRecord(db, id, action)
 
 	// Initialize database-query variables
 
@@ -403,6 +425,14 @@ func Complete(w http.ResponseWriter, r *http.Request) {
 		records = allRecords
 	}
 
+	// Catch if there are tasks to show or not...
+
+	defaultMsgFlag := false
+
+	if len(records) == 0 {
+		defaultMsgFlag = true
+	}
+
 	// Prepare to send data to template
 
 	templateData := struct {
@@ -410,11 +440,13 @@ func Complete(w http.ResponseWriter, r *http.Request) {
 		CurrentDateTime    time.Time
 		TasksArray         []models.Todo
 		TaskStruct         models.Todo
+		DefaultMsgFlag     bool
 		FilterStatus       struct {
 			Incompleted bool
 			Completed   bool
 		}
 	}{
+		DefaultMsgFlag:     defaultMsgFlag,
 		PendingTasksNumber: incompletedTasks,
 		CurrentDateTime:    time.Now(),
 		TasksArray:         records,

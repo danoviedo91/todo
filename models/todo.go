@@ -48,8 +48,13 @@ func (t Todo) UpdateRecord(db *gorm.DB, id string) {
 }
 
 // UpdateCompletedRecord updates a row with boolean "Completed" true or false
-func (t Todo) UpdateCompletedRecord(db *gorm.DB, id string) {
-	db.Model(&t).Where("id = ?", id).Update("completed", !t.Completed)
+func (t Todo) UpdateCompletedRecord(db *gorm.DB, id string, action string) {
+	if action == "complete" {
+		db.Model(&t).Where("id = ?", id).Update("completed", true)
+	} else {
+		db.Model(&t).Where("id = ?", id).Update("completed", false)
+	}
+
 }
 
 // DeleteRecord removes a single record given an id
