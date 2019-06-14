@@ -28,10 +28,18 @@ func main() {
 	port := ""
 
 	err := godotenv.Load()
+
 	if err != nil {
 		port = ":8000"
+		log.Println(".env file not detected... using default PORT 8000")
 	} else {
-		port = os.Getenv("PORT")
+		port = ":" + os.Getenv("PORT")
+		if port == "" {
+			log.Println("PORT env variable not detected... using default PORT 8000")
+			port = ":8000"
+		} else {
+			log.Println(".env file set with PORT", port)
+		}
 	}
 
 	log.Println("Serving...")
