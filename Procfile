@@ -1,1 +1,1 @@
-web: bin/dany-todo-app
+web: bin/dany-todo-app 8000
