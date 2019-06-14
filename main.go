@@ -25,14 +25,13 @@ func main() {
 	http.HandleFunc("/show", actions.Show)
 	http.HandleFunc("/complete", actions.Complete)
 
+	port := ""
+
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-
-	port := os.Getenv("PORT")
-	if port == "" {
 		port = ":8000"
+	} else {
+		port = os.Getenv("PORT")
 	}
 
 	log.Println("Serving...")
